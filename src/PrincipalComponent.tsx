@@ -23,30 +23,20 @@ export const PrincipalComponent: React.FC = () => {
   // END states
 
   // START Data related functions
-  const getDataFromLevel = (level: string) => {
-    db.collection('items')
-      .doc(level)
-      .onSnapshot(async qsp => {
-        const children = await Promise.all(
-          (qsp.data() as any).children
-            ? (qsp.data() as any).children.map(async (c: any) => {
-                return { data: (await c.get()).data(), id: c.id };
-              })
-            : []
-        );
+  const getDataForCurrentLevel = () => {
+    const levels = level.route.split('.');
+    const currentLevel = levels[levels.length - 1];
+    const thisLevel = data.items.filter(i => i.id!! === currentLevel)[0];
+    const childrenIds = (thisLevel.children || []).map(c => c.id!!);
+    const _data = [
+      {
+        ...thisLevel,
+        id: currentLevel,
+        children: data.items.filter(i => childrenIds.includes(i.id!!))
+      }
+    ];
 
-        let items = [
-          {
-            ...(qsp.data() as Item),
-            id: 'main',
-            children: children.map((c: any) => ({ ...c.data, id: c.id }))
-          }
-        ];
-        _setData({
-          loading: false,
-          items
-        });
-      });
+    return _data;
   };
 
   const addItem = (item: Item) => {
@@ -83,9 +73,19 @@ export const PrincipalComponent: React.FC = () => {
   // END Data related functions
 
   React.useEffect(() => {
-    const levels = level.route.split('.');
-    getDataFromLevel(levels[levels.length - 1]);
-  }, [level]);
+    db.collection('items').onSnapshot(async qsp => {
+      const items: Item[] = [];
+
+      qsp.docs.forEach(doc => {
+        items.push({ id: doc.id, ...(doc.data() as Item) });
+      });
+
+      _setData({
+        loading: false,
+        items
+      });
+    });
+  }, [db]);
 
   // For breadcrumbs
   const levels = level.route.split('.');
@@ -95,13 +95,15 @@ export const PrincipalComponent: React.FC = () => {
   return (
     <>
       <ul>
-        {levels_titles.map(l => (
-          <li onClick={() => setLevel(l.route)}>{l.title}</li>
+        {levels_titles.map((l, idx) => (
+          <li key={`levelkey_${idx}`} onClick={() => setLevel(l.route)}>
+            {l.title}
+          </li>
         ))}
       </ul>
       <MainContainer
         loading={data.loading}
-        items={data.items}
+        items={data.loading ? [] : getDataForCurrentLevel()}
         setLevel={setLevel}
       />
       <input

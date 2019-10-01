@@ -39,18 +39,19 @@ export const PrincipalComponent: React.FC = () => {
     return _data;
   };
 
-  const addItem = (item: Item) => {
+  const addItem = async (item: Item) => {
     const levels = level.route.split('.');
+    const new_id = Date.now();
+    await db
+      .collection('items')
+      .doc(`${new_id}`)
+      .set(item);
     db.collection('items')
-      .add(item)
-      .then(item => {
-        db.collection('items')
-          .doc(levels[levels.length - 1])
-          .update({
-            children: firebase.firestore.FieldValue.arrayUnion(
-              db.doc(`items/${item.id}`)
-            )
-          });
+      .doc(levels[levels.length - 1])
+      .update({
+        children: firebase.firestore.FieldValue.arrayUnion(
+          db.doc(`items/${new_id}`)
+        )
       });
   };
 

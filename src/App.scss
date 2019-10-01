@@ -1,0 +1,12 @@
+.itemsList {
+  .item {
+    display: flex;
+    flex-direction: row;
+    p {
+      margin: 0;
+    }
+    input {
+      margin-right: 15px;
+    }
+  }
+}

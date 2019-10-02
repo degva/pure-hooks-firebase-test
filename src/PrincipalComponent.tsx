@@ -18,7 +18,10 @@ export const PrincipalComponent: React.FC = () => {
     loading: true,
     items: []
   });
-  const [level, _setLevel] = React.useState({ route: 'main', titles: 'Main' });
+  const [level, _setLevel] = React.useState({
+    route: 'main',
+    titles: 'Main'
+  });
   const [newText, _setNewText] = React.useState('');
   // END states
 
@@ -89,34 +92,48 @@ export const PrincipalComponent: React.FC = () => {
   }, [db]);
 
   // For breadcrumbs
-  const levels = level.route.split('.');
-  const titles = level.titles.split('.');
-  const levels_titles = levels.map((x, i) => ({ route: x, title: titles[i] }));
+  let levels = level.route.split('.');
+  let titles = level.titles.split('.');
 
+  levels = levels.slice(1, levels.length);
+  titles = titles.slice(0, titles.length - 1);
+
+  const levels_titles = levels.map((x, i) => ({ route: x, title: titles[i] }));
   return (
     <>
-      <ul>
+      <ol className="breadcrumb">
         {levels_titles.map((l, idx) => (
           <li key={`levelkey_${idx}`} onClick={() => setLevel(l.route)}>
             {l.title}
           </li>
         ))}
-      </ul>
+      </ol>
       <MainContainer
         loading={data.loading}
         items={data.loading ? [] : getDataForCurrentLevel()}
         setLevel={setLevel}
       />
-      <input
-        value={newText}
-        onChange={e => _setNewText(e.target.value)}
-        onKeyPress={k => {
-          if (k.key === 'Enter') {
+      <div className="newItem">
+        <input
+          value={newText}
+          onChange={e => _setNewText(e.target.value)}
+          placeholder="New item..."
+          onKeyPress={k => {
+            if (k.key === 'Enter') {
+              addItem({ text: newText, isDone: false });
+              _setNewText('');
+            }
+          }}
+        />
+        <button
+          onClick={() => {
             addItem({ text: newText, isDone: false });
             _setNewText('');
-          }
-        }}
-      />
+          }}
+        >
+          Add new
+        </button>
+      </div>
     </>
   );
 };

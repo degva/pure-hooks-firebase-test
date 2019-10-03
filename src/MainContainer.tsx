@@ -16,7 +16,7 @@ export const MainContainer: React.FC<{
     <p>Loading...</p>
   ) : (
     <>
-      <h1>{props.items[0].text}</h1>
+      <h1 className="listTitle">{props.items[0].text}</h1>
       <ItemListComponent
         items={props.items[0].children!!}
         setLevel={props.setLevel}

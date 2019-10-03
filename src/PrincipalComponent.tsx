@@ -7,6 +7,7 @@ export interface Item {
   id?: string;
   text: string;
   isDone: boolean;
+  parent: string;
   children?: Item[];
 }
 
@@ -120,14 +121,22 @@ export const PrincipalComponent: React.FC = () => {
           placeholder="New item..."
           onKeyPress={k => {
             if (k.key === 'Enter') {
-              addItem({ text: newText, isDone: false });
+              addItem({
+                text: newText,
+                isDone: false,
+                parent: levels[levels.length - 1] || 'main'
+              });
               _setNewText('');
             }
           }}
         />
         <button
           onClick={() => {
-            addItem({ text: newText, isDone: false });
+            addItem({
+              text: newText,
+              isDone: false,
+              parent: levels[levels.length - 1] || 'main'
+            });
             _setNewText('');
           }}
         >

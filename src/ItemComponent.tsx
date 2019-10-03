@@ -26,6 +26,22 @@ export const ItemComponent: React.FC<{
       });
   };
 
+  const onRemove = async () => {
+    if (window.confirm('Want to remove?')) {
+      await db
+        .collection('items')
+        .doc(item.parent)
+        .update({
+          children: firebase.firestore.FieldValue.arrayRemove(
+            `/item/${item.id!!}`
+          )
+        });
+      db.collection('items')
+        .doc(item.id!!)
+        .delete();
+    }
+  };
+
   React.useEffect(() => {
     setIsChecked(props.item.isDone);
   }, [props.item]);
@@ -34,6 +50,7 @@ export const ItemComponent: React.FC<{
     <li className="item" key={item.id}>
       <input type="checkbox" checked={isCheked} onChange={onChangeCheck} />
       <p onClick={() => props.setLevel(item.id!!, item.text)}>{item.text}</p>
+      <button onClick={onRemove}>X</button>
     </li>
   );
 };

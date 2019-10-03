@@ -1,3 +1,8 @@
+.listTitle {
+  margin-left: 15px;
+  color: #282828;
+}
+
 .itemsList {
   .item {
     display: flex;
@@ -11,7 +16,20 @@
     }
     input {
       margin-right: 15px;
-      // display: none;
+      &:checked ~ p {
+        text-decoration: line-through;
+      }
+    }
+    button {
+      margin-left: 5px;
+      border: none;
+      background-color: #eee;
+      border-radius: 10px;
+      padding: 1;
+      cursor: pointer;
+      &:hover {
+        background-color: #ccc;
+      }
     }
   }
 }
@@ -40,6 +58,12 @@
     border: none;
     font-size: 1em;
     border-bottom: 1px solid #555;
+    padding-left: 5px;
+    padding-bottom: 5px;
+    &:focus {
+      border-color: blue;
+      border-width: 1.5px;
+    }
   }
   button {
     font-size: 1em;
